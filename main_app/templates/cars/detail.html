@@ -2,13 +2,54 @@
 {% block content %}
 
 <h1>Car Details</h1>
-
-<div class="card">
-    <div class="card-content">
-      <span class="card-title">{{ car.make }}</span>
-      <p>model: {{ car.model }}</p>
-      <p>year: {{ car.year }}</p>
-      <p>Description: {{ car.description }}</p>
+<div class="row">
+  <div class="col s6">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">{{ car.make }}</span>
+        <p>model: {{ car.model }}</p>
+        <p>year: {{ car.year }}</p>
+        <p>Description: {{ car.description|linebreaks }}</p>
+      </div>
+        <div class="card-action">
+          <a href="{% url 'cars_update' car.id %}">Edit</a>
+          <a href="{% url 'cars_delete' car.id %}">Delete</a>
+        </div>
     </div>
   </div>
+  <div class="col s6">
+    <form action="{% url 'add_updates' car.id %}" method="POST">
+        {% csrf_token %}
+        <!-- Render the inputs -->
+        {{ updates_form.as_p }}
+        <input type="submit" class="btn" value="Add Updates">
+    </form>
+    <table class="striped">
+      <thead>
+        <tr><th>Date</th><th>Service</th></tr>
+      </thead>
+      <tbody>
+        {% for updates in car.updates_set.all %}
+          <tr>
+            <td>{{updates.date}}</td>
+            <td>{{updates.get_service_display}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- New Markup Above -->
+</div>
+<script>
+    const dateEl = document.getElementById('id_date');
+   M.Datepicker.init(dateEl, {
+     format: 'yyyy-mm-dd',
+     defaultDate: new Date(),
+     setDefaultDate: true,
+     autoClose: true
+  });
+
+    const selectEl = document.getElementById('id_service');
+    M.FormSelect.init(selectEl);
+</script>
 {% endblock %}
